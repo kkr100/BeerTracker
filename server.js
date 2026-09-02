@@ -4,7 +4,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const Database = require('better-sqlite3');
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const root = __dirname;
 const database = new Database(path.join(root, 'hoplog.db'));
 database.pragma('journal_mode = WAL');
@@ -88,4 +88,4 @@ const server = http.createServer(async (request, response) => {
   fs.createReadStream(filePath).pipe(response);
 });
 
-server.listen(PORT, () => console.log(`Hoplog running at http://localhost:${PORT}`));
+server.listen(PORT, '0.0.0.0', () => console.log(`Hoplog running on port ${PORT}`));
