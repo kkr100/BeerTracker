@@ -175,7 +175,12 @@ authForm.addEventListener('submit', (event) => {
     const result = await response.json();
     if (!response.ok) throw new Error(result.error);
     setCurrentUser(result.email); closeAuth();
-  }).catch((error) => { authError.textContent = error.message || 'Unable to connect to Hoplog.'; authError.hidden = false; });
+  }).catch((error) => {
+    authError.textContent = error instanceof TypeError
+      ? 'The login server is not available. Host Hoplog with Node.js and SQLite enabled.'
+      : (error.message || 'Unable to connect to Hoplog.');
+    authError.hidden = false;
+  });
 });
 
 updateAccountButton(); render();
