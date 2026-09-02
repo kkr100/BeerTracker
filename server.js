@@ -75,6 +75,10 @@ async function handleAuth(request, response, mode) {
 const mimeTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const server = http.createServer(async (request, response) => {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
+  if (request.method === 'OPTIONS') {
+    response.writeHead(204);
+    return response.end();
+  }
   if (request.method === 'POST' && requestUrl.pathname === '/api/register') return handleAuth(request, response, 'register');
   if (request.method === 'POST' && requestUrl.pathname === '/api/login') return handleAuth(request, response, 'login');
   if (request.method !== 'GET') return sendJson(response, 405, { error: 'Method not allowed.' });
