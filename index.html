@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f1e8" />
+  <title>Hoplog | Beer tasting journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Hoplog home">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span>krijolee</span>
+      </a>
+      <div class="account-area">
+        <div class="topbar-meta"><span class="status-dot"></span></div>
+        <button class="account-button" id="account-button" type="button">Log in <span>↗</span></button>
+      </div>
+    </header>
+
+    <main id="top" class="page-content">
+      <section class="intro-row">
+        <div>
+          <p class="eyebrow">THE BEER NOTEBOOK <span>•</span> </p>
+          <h1>Remember the<br><em>good pours.</em></h1>
+        </div>
+      </section>
+
+      <section class="stats-bar" aria-label="Collection statistics">
+        <div class="stat"><span class="stat-value" id="beer-count">0</span><span class="stat-label">beers logged</span></div>
+        <div class="stat"><span class="stat-value" id="average-rating">—</span><span class="stat-label">average rating</span></div>
+        <div class="stat"><span class="stat-value" id="top-style">—</span><span class="stat-label">favorite style</span></div>
+        <div class="stats-note">Small batch memories<br><strong>Since your first sip.</strong></div>
+      </section>
+
+      <div class="workspace-grid">
+        <aside class="entry-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">NEW ENTRY</p>
+              <h2>Log a tasting</h2>
+            </div>
+            <span class="entry-number">01</span>
+          </div>
+          <form id="beer-form">
+            <label class="field-label" for="beer-name">Beer name <span>*</span></label>
+            <input id="beer-name" name="name" type="text" placeholder="e.g. Foggy Window" required />
+
+            <div class="field-row">
+              <div>
+                <label class="field-label" for="brewery">Brewery</label>
+                <input id="brewery" name="brewery" type="text" placeholder="Who made it?" />
+              </div>
+              <div>
+                <label class="field-label" for="style">Style</label>
+                <select id="style" name="style">
+                  <option>IPA</option>
+                  <option>Lager</option>
+                  <option>Stout</option>
+                  <option>Sour</option>
+                  <option>Wheat beer</option>
+                  <option>Pale Ale</option>
+                  <option>Porter</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <span class="field-label" id="rating-label">Your rating <span>*</span></span>
+            <div class="rating-picker" id="rating-picker" role="radiogroup" aria-labelledby="rating-label">
+              <button type="button" class="rating-star" data-rating="1" aria-label="1 out of 5">★</button>
+              <button type="button" class="rating-star" data-rating="2" aria-label="2 out of 5">★</button>
+              <button type="button" class="rating-star" data-rating="3" aria-label="3 out of 5">★</button>
+              <button type="button" class="rating-star" data-rating="4" aria-label="4 out of 5">★</button>
+              <button type="button" class="rating-star" data-rating="5" aria-label="5 out of 5">★</button>
+              <span class="rating-value" id="rating-value">Pick a rating</span>
+            </div>
+
+            <label class="field-label" for="notes">Tasting notes</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Aroma, flavor, the setting..."></textarea>
+
+            <span class="field-label" id="photo-label">Bottle or can photo</span>
+            <label class="photo-upload" for="photo">
+              <span class="upload-icon">+</span>
+              <span><strong>Add a photo</strong><small>JPG or PNG, up to 5 MB</small></span>
+              <input id="photo" name="photo" type="file" accept="image/png,image/jpeg,image/webp" />
+            </label>
+            <div class="photo-preview" id="photo-preview" hidden>
+              <img id="preview-image" alt="Selected beer preview" />
+              <button type="button" id="remove-photo" aria-label="Remove selected photo">×</button>
+            </div>
+
+            <button class="primary-button" type="submit"><span>Save tasting</span><span>↗</span></button>
+          </form>
+        </aside>
+
+        <section class="collection-panel" aria-labelledby="collection-title">
+          <div class="collection-heading">
+            <div>
+              <p class="eyebrow">YOUR COLLECTION</p>
+              <h2 id="collection-title">Recent tastings <span id="visible-count">0</span></h2>
+            </div>
+            <div class="collection-tools">
+              <label class="search-box" for="search-input"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Search your log" /></label>
+              <select id="sort-select" aria-label="Sort tastings">
+                <option value="newest">Newest first</option>
+                <option value="rating">Highest rated</option>
+                <option value="name">Name A—Z</option>
+              </select>
+            </div>
+          </div>
+          <div class="filter-row" id="filter-row" aria-label="Filter by beer style">
+            <button class="filter-chip active" data-filter="All">All <span id="all-count">0</span></button>
+            <button class="filter-chip" data-filter="IPA">IPA</button>
+            <button class="filter-chip" data-filter="Lager">Lager</button>
+            <button class="filter-chip" data-filter="Stout">Stout</button>
+            <button class="filter-chip" data-filter="Sour">Sour</button>
+            <button class="filter-chip" data-filter="Other">Other</button>
+          </div>
+          <div class="beer-list" id="beer-list"></div>
+          <div class="empty-state" id="empty-state" hidden>
+            <span class="empty-mark">∅</span>
+            <h3>No tastings found</h3>
+            <p>Try another search, or log your next pour.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer class="footer"><span>HOPLOG / TASTING JOURNAL</span><span>Made for the curious palate</span></footer>
+
+    <div class="auth-backdrop" id="auth-backdrop" hidden>
+      <dialog class="auth-modal" open aria-labelledby="auth-title">
+        <button class="auth-close" id="auth-close" type="button" aria-label="Close login dialog">×</button>
+        <p class="eyebrow">YOUR PRIVATE JOURNAL</p>
+        <h2 id="auth-title">Keep your pours<br><em>in one place.</em></h2>
+        <p class="auth-subtitle" id="auth-subtitle">Log in to see your beer list on this device.</p>
+        <form id="auth-form">
+          <label class="auth-label" for="auth-email">Email</label>
+          <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required />
+          <label class="auth-label" for="auth-password">Password</label>
+          <input id="auth-password" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required />
+          <p class="auth-error" id="auth-error" role="alert" hidden></p>
+          <button class="primary-button auth-submit" type="submit"><span id="auth-submit-label">Log in</span><span>↗</span></button>
+        </form>
+        <p class="auth-switch"><span id="auth-switch-copy">New to Hoplog?</span> <button id="auth-switch" type="button">Create an account</button></p>
+        <p class="auth-local-note">Accounts are stored securely in the local database.</p>
+      </dialog>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
