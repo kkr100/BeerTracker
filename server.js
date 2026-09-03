@@ -112,4 +112,14 @@ const server = http.createServer(async (request, response) => {
   fs.createReadStream(filePath).pipe(response);
 });
 
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Stop the existing server or start Hoplog with another port, for example: PORT=3001 npm start`);
+    process.exitCode = 1;
+    return;
+  }
+  console.error('Unable to start Hoplog:', error);
+  process.exitCode = 1;
+});
+
 server.listen(PORT, '0.0.0.0', () => console.log(`Hoplog running on port ${PORT}`));

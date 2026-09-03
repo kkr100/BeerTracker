@@ -13,6 +13,32 @@ Open <http://localhost:3000>.
 
 Use the URL printed by `npm.cmd start`. Do not open `index.html` directly or use a static web server such as Live Server, because account registration and login require the Node API at `/api/register` and `/api/login`.
 
+To enable the **Forgot your password?** option, set a private reset token before starting the server. Give this token only to trusted users who need to reset an account:
+
+```bash
+PASSWORD_RESET_TOKEN='replace-with-a-long-random-secret' npm start
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:PASSWORD_RESET_TOKEN = 'replace-with-a-long-random-secret'
+npm.cmd start
+```
+
+If port `3000` is already in use, stop the other Hoplog process or choose another port:
+
+```bash
+PORT=3001 npm start
+```
+
+On Windows PowerShell, use:
+
+```powershell
+$env:PORT = 3001
+npm.cmd start
+```
+
 The server creates `hoplog.db` in the project folder. Passwords are stored as salted `scrypt` hashes. The database files are excluded from Git by `.gitignore`.
 
 ## Hosting
