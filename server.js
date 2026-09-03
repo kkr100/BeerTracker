@@ -34,6 +34,14 @@ function verifyPassword(password, storedHash) {
   return crypto.timingSafeEqual(Buffer.from(actualHash, 'hex'), Buffer.from(expectedHash, 'hex'));
 }
 
+function hasValidResetToken(token) {
+  const expectedToken = process.env.PASSWORD_RESET_TOKEN || '';
+  if (!expectedToken || typeof token !== 'string') return false;
+  const actual = Buffer.from(token);
+  const expected = Buffer.from(expectedToken);
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
+
 function isValidEmail(email) {
   const atIndex = email.indexOf('@');
   const domain = email.slice(atIndex + 1);
@@ -58,13 +66,19 @@ function readJson(request) {
 
 async function handleAuth(request, response, mode) {
   try {
-    const { email, password } = await readJson(request);
+    const { email, password, token } = await readJson(request);
     const normalizedEmail = String(email || '').trim().toLowerCase();
     if (!isValidEmail(normalizedEmail) || typeof password !== 'string' || password.length < 6) {
       return sendJson(response, 400, { error: 'Enter a valid email and a password with at least 6 characters.' });
     }
     const findUser = database.prepare('SELECT email, password_hash FROM users WHERE email = ?');
     const existingUser = findUser.get(normalizedEmail);
+    if (mode === 'reset') {
+      if (!hasValidResetToken(token)) return sendJson(response, 403, { error: 'The password reset token is invalid or not configured.' });
+      if (!existingUser) return sendJson(response, 404, { error: 'No account was found for that email.' });
+      database.prepare('UPDATE users SET password_hash = ? WHERE email = ?').run(hashPassword(password), normalizedEmail);
+      return sendJson(response, 200, { email: normalizedEmail });
+    }
     if (mode === 'register') {
       if (existingUser) return sendJson(response, 409, { error: 'That account already exists. Try logging in.' });
       database.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)').run(normalizedEmail, hashPassword(password));
@@ -86,6 +100,7 @@ const server = http.createServer(async (request, response) => {
   }
   if (request.method === 'POST' && requestUrl.pathname === '/api/register') return handleAuth(request, response, 'register');
   if (request.method === 'POST' && requestUrl.pathname === '/api/login') return handleAuth(request, response, 'login');
+  if (request.method === 'POST' && requestUrl.pathname === '/api/reset-password') return handleAuth(request, response, 'reset');
   if (request.method !== 'GET') return sendJson(response, 405, { error: 'Method not allowed.' });
 
   const requestedPath = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
