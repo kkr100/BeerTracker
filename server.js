@@ -2,11 +2,16 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { fileURLToPath } = require('node:url');
 const Database = require('better-sqlite3');
 
 const PORT = Number(process.env.PORT) || 3000;
 const root = __dirname;
-const database = new Database(path.join(root, 'hoplog.db'));
+const databaseUrl = process.env.DATABASE_URL || '';
+const databasePath = databaseUrl.startsWith('file:')
+  ? fileURLToPath(databaseUrl)
+  : databaseUrl || path.join(root, 'hoplog.db');
+const database = new Database(databasePath);
 database.pragma('journal_mode = WAL');
 database.exec(`
   CREATE TABLE IF NOT EXISTS users (
