@@ -11,6 +11,8 @@ npm.cmd start
 
 Open <http://localhost:3000>.
 
+Use the URL printed by `npm.cmd start`. Do not open `index.html` directly or use a static web server such as Live Server, because account registration and login require the Node API at `/api/register` and `/api/login`.
+
 The server creates `hoplog.db` in the project folder. Passwords are stored as salted `scrypt` hashes. The database files are excluded from Git by `.gitignore`.
 
 ## Hosting
