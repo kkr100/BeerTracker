@@ -172,6 +172,10 @@ authForm.addEventListener('submit', (event) => {
   fetch(`/api/${authMode === 'register' ? 'register' : 'login'}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password })
   }).then(async (response) => {
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error('The API is not running. Start Hoplog with "npm.cmd start" and open the Node server URL.');
+    }
     const result = await response.json();
     if (!response.ok) throw new Error(result.error);
     setCurrentUser(result.email); closeAuth();
