@@ -141,6 +141,12 @@ document.querySelector('#remove-photo').addEventListener('click', () => { photoD
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
+  if (!currentUser) {
+    openAuth('login');
+    authError.textContent = 'Log in to save a tasting to your private journal.';
+    authError.hidden = false;
+    return;
+  }
   const data = new FormData(form);
   if (!selectedRating) { ratingValue.textContent = 'Pick a rating first'; ratingValue.style.color = '#ef9470'; return; }
   beers.unshift({ id: `beer-${Date.now()}`, name: data.get('name'), brewery: data.get('brewery'), style: data.get('style'), rating: selectedRating, notes: data.get('notes'), date: new Date().toISOString().slice(0, 10), image: photoData });
