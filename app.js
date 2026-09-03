@@ -28,7 +28,10 @@ const authBackdrop = document.querySelector('#auth-backdrop');
 const authForm = document.querySelector('#auth-form');
 const authEmail = document.querySelector('#auth-email');
 const authPassword = document.querySelector('#auth-password');
+const authTokenField = document.querySelector('#auth-token-field');
+const authToken = document.querySelector('#auth-token');
 const authError = document.querySelector('#auth-error');
+const authReset = document.querySelector('#auth-reset');
 
 function loadBeers() {
   const stored = localStorage.getItem(currentUser ? `${STORAGE_KEY}:${currentUser}` : STORAGE_KEY);
@@ -46,13 +49,26 @@ function updateAccountButton() {
   accountButton.classList.toggle('logged-in', Boolean(currentUser));
 }
 
+const authCopy = {
+  login: { title: 'Keep your pours<br><em>in one place.</em>', subtitle: 'Log in to see your beer list on this device.', submit: 'Log in', switchCopy: 'New to Hoplog?', switchLabel: 'Create an account' },
+  register: { title: 'Start your private<br><em>beer journal.</em>', subtitle: 'Create an account to keep your tastings separate.', submit: 'Create account', switchCopy: 'Already have an account?', switchLabel: 'Log in' },
+  reset: { title: 'Reset your private<br><em>beer journal.</em>', subtitle: 'Enter the reset token supplied by your server administrator.', submit: 'Reset password', switchCopy: 'Remembered your password?', switchLabel: 'Log in' }
+};
+
 function openAuth(mode = 'login') {
   authMode = mode;
-  document.querySelector('#auth-title').innerHTML = mode === 'login' ? 'Keep your pours<br><em>in one place.</em>' : 'Start your private<br><em>beer journal.</em>';
-  document.querySelector('#auth-subtitle').textContent = mode === 'login' ? 'Log in to see your beer list on this device.' : 'Create an account to keep your tastings separate.';
-  document.querySelector('#auth-submit-label').textContent = mode === 'login' ? 'Log in' : 'Create account';
-  document.querySelector('#auth-switch-copy').textContent = mode === 'login' ? 'New to Hoplog?' : 'Already have an account?';
-  document.querySelector('#auth-switch').textContent = mode === 'login' ? 'Create an account' : 'Log in';
+  const copy = authCopy[mode] || authCopy.login;
+  const isReset = mode === 'reset';
+  document.querySelector('#auth-title').innerHTML = copy.title;
+  document.querySelector('#auth-subtitle').textContent = copy.subtitle;
+  document.querySelector('#auth-submit-label').textContent = copy.submit;
+  document.querySelector('#auth-switch-copy').textContent = copy.switchCopy;
+  document.querySelector('#auth-switch').textContent = copy.switchLabel;
+  authReset.hidden = mode !== 'login';
+  authTokenField.hidden = !isReset;
+  authToken.required = isReset;
+  authPassword.autocomplete = isReset ? 'new-password' : 'current-password';
+  authPassword.placeholder = isReset ? 'New password, at least 6 characters' : 'At least 6 characters';
   authError.hidden = true; authBackdrop.hidden = false; authEmail.focus();
 }
 
@@ -171,12 +187,17 @@ document.querySelector('#account-button').addEventListener('click', () => {
 document.querySelector('#auth-close').addEventListener('click', closeAuth);
 authBackdrop.addEventListener('click', (event) => { if (event.target === authBackdrop) closeAuth(); });
 document.querySelector('#auth-switch').addEventListener('click', () => openAuth(authMode === 'login' ? 'register' : 'login'));
+authReset.addEventListener('click', () => openAuth('reset'));
 authForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const email = authEmail.value.trim().toLowerCase();
   const password = authPassword.value;
-  fetch(`/api/${authMode === 'register' ? 'register' : 'login'}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password })
+  let endpoint = 'login';
+  if (authMode === 'register') endpoint = 'register';
+  if (authMode === 'reset') endpoint = 'reset-password';
+  const token = authMode === 'reset' ? authToken.value : '';
+  fetch(`/api/${endpoint}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, token })
   }).then(async (response) => {
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {

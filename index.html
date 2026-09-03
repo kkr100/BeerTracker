@@ -144,9 +144,14 @@
           <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required />
           <label class="auth-label" for="auth-password">Password</label>
           <input id="auth-password" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required />
+          <div id="auth-token-field" hidden>
+            <label class="auth-label" for="auth-token">Reset token</label>
+            <input id="auth-token" type="password" autocomplete="off" placeholder="Token from the server administrator" />
+          </div>
           <p class="auth-error" id="auth-error" role="alert" hidden></p>
           <button class="primary-button auth-submit" type="submit"><span id="auth-submit-label">Log in</span><span>↗</span></button>
         </form>
+        <button class="auth-reset" id="auth-reset" type="button">Forgot your password?</button>
         <p class="auth-switch"><span id="auth-switch-copy">New to Hoplog?</span> <button id="auth-switch" type="button">Create an account</button></p>
         <p class="auth-local-note">Accounts are stored securely in the local database.</p>
       </dialog>
